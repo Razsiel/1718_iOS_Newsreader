@@ -30,7 +30,7 @@ public class ArticleTableViewModel {
         if nextId == nil {
             self.pendingRequest = articleService.getArticles(onSucces: succes, onFailure: failure)
         } else {
-            self.pendingRequest = articleService.getArticle(nextId: self.nextId, count: 20, onSucces: succes, onFailure: failure)
+            self.pendingRequest = articleService.getArticle(withId: self.nextId!, count: 20, onSucces: succes, onFailure: failure)
         }
     }
     
