@@ -1,6 +1,6 @@
 //
 //  ArticleTableViewCell.swift
-//  Newsreader
+//  Newsreader_560825
 //
 //  Created by Geoffrey Arkenbout on 10/9/17.
 //  Copyright © 2017 Geoffrey Arkenbout. All rights reserved.
@@ -29,37 +29,20 @@ class ArticleTableViewCell: UITableViewCell {
         // Configure the view for the selected state
     }
     
-    public func fill() {
-        titleLabel.text = self.article?.title
-        summaryLabel.text = self.article?.summary
+    public func fill(with article: Article) {
+        self.article = article
         
-        // cancel any request still in the air to prevent the wrong data from being loaded into the cell
+        titleLabel.text = self.article!.title
+        summaryLabel.text = self.article!.summary
+        
         task?.cancel()
         
-        // image handling
-        // succes closure
-        let succes = { (_ data: Data) in
-            self.articleImage.image = UIImage(data: data)
-        }
-        
-        // failure closure
-        let failure = {
-            self.articleImage.image = UIImage(named: "broken_image")
-        }
-        
-        if let imageUrl = article?.image {
-            if let url = URL(string: imageUrl) {
-                task = HttpClient.send(withUrl: url, onSucces: succes, onFailure: failure)
-            } else {
-                failure()
-            }
-        } else {
-            failure()
-        }
+        let imageUrl = self.article!.image
+        self.task = articleImage.loadImageAsync(from: imageUrl)
     }
     
     override func prepareForReuse() {
-        articleImage.image = UIImage(named: "placeholder")
+        self.articleImage.image = UIImage(named: "placeholder")
     }
 
 }

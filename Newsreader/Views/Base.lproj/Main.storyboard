@@ -92,7 +92,7 @@
         <!--Article detail-->
         <scene sceneID="z7L-1Y-f67">
             <objects>
-                <viewController title="Article detail" id="lfO-kA-2gx" sceneMemberID="viewController">
+                <viewController title="Article detail" id="lfO-kA-2gx" customClass="ArticleDetailViewController" customModule="Newsreader_560825" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="Rrl-iT-RGI">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -123,6 +123,7 @@
                                 <nil key="highlightedColor"/>
                             </label>
                         </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <constraints>
                             <constraint firstItem="9pd-g7-JDG" firstAttribute="top" secondItem="EWX-ia-Ves" secondAttribute="bottom" constant="8" id="2YQ-2g-9l8"/>
                             <constraint firstItem="EWX-ia-Ves" firstAttribute="leading" secondItem="3Q1-Uz-T6B" secondAttribute="leading" constant="16" id="3lI-aD-3OA"/>
@@ -139,6 +140,12 @@
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="3Q1-Uz-T6B"/>
                     </view>
+                    <connections>
+                        <outlet property="articleImage" destination="9H5-cC-6GV" id="9x6-eQ-q6c"/>
+                        <outlet property="dateLabel" destination="ujH-hb-vsp" id="T3L-fm-Ig2"/>
+                        <outlet property="summaryLabel" destination="9pd-g7-JDG" id="LMM-xp-pSW"/>
+                        <outlet property="titleLabel" destination="EWX-ia-Ves" id="gSt-rw-0c4"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="j3E-lM-pJt" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>

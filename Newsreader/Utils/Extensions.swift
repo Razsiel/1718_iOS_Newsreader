@@ -43,7 +43,13 @@ extension Dictionary {
     func stringFromHttpParameters() -> String {
         let parameterArray = map { key, value -> String in
             let percentEscapedKey = (key as! String).addingPercentEncodingForURLQueryValue()!
-            let percentEscapedValue = (value as! String).addingPercentEncodingForURLQueryValue()!
+            var percentEscapedValue: String
+            if let val = (value as? String) {
+                percentEscapedValue = val.addingPercentEncodingForURLQueryValue()!
+            } else {
+                // in case the type could not be casted (Swift primitive types can not be cast to/from each other) -> create a new string containing the contents
+                percentEscapedValue = String(describing: value).addingPercentEncodingForURLQueryValue()!
+            }
             return "\(percentEscapedKey)=\(percentEscapedValue)"
         }
         

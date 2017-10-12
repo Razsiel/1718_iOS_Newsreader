@@ -1,6 +1,6 @@
 //
 //  ArticleTableViewController.swift
-//  Newsreader
+//  Newsreader_560825
 //
 //  Created by Geoffrey Arkenbout on 10/9/17.
 //  Copyright © 2017 Geoffrey Arkenbout. All rights reserved.
@@ -10,17 +10,10 @@ import UIKit
 
 class ArticleTableViewController: UITableViewController {
 
-    var articles : [Article] = []
-    var nextId : Int?
+    var viewModel: ArticleTableViewModel = ArticleTableViewModel()
     
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        // Uncomment the following line to preserve selection between presentations
-        // self.clearsSelectionOnViewWillAppear = false
-
-        // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
-        // self.navigationItem.rightBarButtonItem = self.editButtonItem
         
         // Pull to refresh
         self.refreshControl = UIRefreshControl()
@@ -32,12 +25,18 @@ class ArticleTableViewController: UITableViewController {
                                        for: UIControlEvents.valueChanged)
         
         // initial load of article data
-        loadMore()
+        viewModel.loadMore(onSucces: refreshTable)
     }
     
     @IBAction func refresh(){
         self.refreshControl?.endRefreshing()
-        self.tableView.reloadData()
+        viewModel.cancelCurrentRequest()
+        // clear articles cache
+        viewModel.clearArticles()
+        // refresh the view
+        refreshTable()
+        // reload data
+        viewModel.loadMore(onSucces: refreshTable)
     }
 
     override func didReceiveMemoryWarning() {
@@ -54,20 +53,33 @@ class ArticleTableViewController: UITableViewController {
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         // #warning Incomplete implementation, return the number of rows
-        return articles.count
+        return viewModel.getArticleCount()
     }
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "articleIdentifier", for: indexPath) as! ArticleTableViewCell
 
-        // Configure the cell...
-        // call service class
-        cell.article = articles[indexPath.row]
-        cell.fill()
+        // Fill the cell
+        if let article = viewModel.getArticle(at: indexPath.row) {
+            cell.fill(with: article)
+        }
 
         return cell
     }
     
+    // Infinite scrolling
+    override func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+        if  indexPath.row >= self.viewModel.getArticleCount() - 1 && !viewModel.hasRequest() {
+            let viewModel = self.viewModel
+            
+            viewModel.loadMore(onSucces: {
+                self.viewModel = viewModel
+                self.refreshTable()
+            })
+        }
+    }
+    
+    // Prepare data that needs to be sent to a different view/window
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         // Get the new view controller using segue.destinationViewController.
         // Pass the selected object to the new view controller.
@@ -78,29 +90,11 @@ class ArticleTableViewController: UITableViewController {
         }
     }
     
+    // Refreshes the table view
     func refreshTable(){
+        // Send async call to UI-thread
         DispatchQueue.main.async {
             self.tableView.reloadData()
         }
     }
-    
-    func loadMore() {
-        
-        let succes =  { (_ result : ArticleResult) in
-            print("succes!!!")
-            print(result.nextId)
-            for article : Article in result.results {
-                self.articles.append(article)
-            }
-            self.nextId = result.nextId
-            self.refreshTable()
-        }
-        
-        let failure = {
-            print("failed...")
-        }
-        
-        articleService.getArticles(nextId: nextId, onSucces: succes, onFailure: failure)
-    }
-
 }
