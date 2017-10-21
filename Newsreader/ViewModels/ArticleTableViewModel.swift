@@ -14,6 +14,7 @@ public class ArticleTableViewModel {
     var pendingRequest: URLSessionTask? = nil
     
     public func loadMore(onSucces: @escaping () -> ()) {
+        // succes closure
         let succes =  { (_ result : ArticleResult) in
             for article : Article in result.results {
                 self.articles.append(article)
@@ -23,10 +24,12 @@ public class ArticleTableViewModel {
             self.pendingRequest = nil
         }
         
+        // failure closure
         let failure = {
             print("failed...")
         }
         
+        // call service layer
         if nextId == nil {
             self.pendingRequest = articleService.getArticles(onSucces: succes, onFailure: failure)
         } else {
