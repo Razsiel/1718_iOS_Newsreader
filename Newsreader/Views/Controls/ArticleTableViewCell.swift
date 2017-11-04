@@ -13,6 +13,7 @@ class ArticleTableViewCell: UITableViewCell {
     @IBOutlet weak var articleImage: UIImageView!
     @IBOutlet weak var titleLabel: UILabel!
     @IBOutlet weak var summaryLabel: UILabel!
+    @IBOutlet weak var favoriteImage: UIImageView!
     
     public var article : Article?
     
@@ -34,15 +35,17 @@ class ArticleTableViewCell: UITableViewCell {
         
         titleLabel.text = self.article!.title
         summaryLabel.text = self.article!.summary
+        favoriteImage.isHidden = !self.article!.isLiked
         
+        // image loading
         task?.cancel()
-        
         let imageUrl = self.article!.image
         self.task = articleImage.loadImageAsync(from: imageUrl)
     }
     
     override func prepareForReuse() {
         self.articleImage.image = UIImage(named: "placeholder")
+        self.favoriteImage.isHidden = true
     }
 
 }

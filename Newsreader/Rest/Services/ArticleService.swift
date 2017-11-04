@@ -37,6 +37,17 @@ public class ArticleService {
         }, onFailure: onFailure)
     }
     
+    /**
+     Makes a http call to /api/articles/(id) and parses the incoming data
+     
+     - parameters:
+         - withId: The id of the article that will be gotten
+         - count: OPTIONAL, how many items will be loaded as well
+         - onSucces: Closure to call if the data was retrieved and parsed succesfully
+         - onFailure: Closure to call if the data could not be retrieved or parsed
+     
+     - returns: The URLSessionTask object that makes the request. By capturing this object, a request can be cancelled at any time by calling .cancel()
+     */
     public func getArticle(withId id : Int,
                            count: Int?,
                            onSucces: @escaping (_ result: ArticleResult) -> (),
@@ -72,5 +83,28 @@ public class ArticleService {
             print("There was an error trying to map api-data to object (\(ArticleResult.self)): \n \(error)")
             onFailure()
         }
+    }
+    
+    /**
+     Makes a http call to /api/articles/(id)/like. NOTE: does not parse any data since api call returns an empty JSON object
+     
+     - parameters:
+         - withId: The article to like
+         - onSucces: Closure to call if the data was retrieved and parsed succesfully
+         - onFailure: Closure to call if the data could not be retrieved or parsed
+     
+     - returns: The URLSessionTask object that makes the request. By capturing this object, a request can be cancelled at any time by calling .cancel()
+     */
+    public func likeArticle(withId id: Int,
+                            newState state: Bool,
+                            onSucces: @escaping () -> (),
+                            onFailure: @escaping () -> ()) -> URLSessionTask? {
+        // call to network layer
+        return apiClient.send(toRelativePath: "/api/articles/\(id)/like",
+            withHttpMethod: state ? HttpMethod.PUT : HttpMethod.DELETE,
+            onSuccesParser: { (_ data: Data) in
+                // call succes closure
+                onSucces()
+        }, onFailure: onFailure)
     }
 }

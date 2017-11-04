@@ -31,9 +31,13 @@ public class ArticleTableViewModel {
         
         // call service layer
         if nextId == nil {
-            self.pendingRequest = articleService.getArticles(onSucces: succes, onFailure: failure)
+            self.pendingRequest = articleService.getArticles(onSucces: succes,
+                                                             onFailure: failure)
         } else {
-            self.pendingRequest = articleService.getArticle(withId: self.nextId!, count: 20, onSucces: succes, onFailure: failure)
+            self.pendingRequest = articleService.getArticle(withId: self.nextId!,
+                                                            count: 20,
+                                                            onSucces: succes,
+                                                            onFailure: failure)
         }
     }
     
@@ -46,6 +50,7 @@ public class ArticleTableViewModel {
     }
     
     public func clearArticles() {
+        self.nextId = nil
         self.articles = []
     }
     

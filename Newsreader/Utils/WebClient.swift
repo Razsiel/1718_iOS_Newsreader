@@ -17,6 +17,7 @@ public class WebClient {
          - withUrl: The url to send the request to
          - withHttpMethod: The httpmethod of the request (ex. GET, POST)
          - withParameters: A dictionary containing data to send as url encoded parameters.
+         - encodedAs: The encoding that the paramters are encoded as
          - withHeaders: A dictionary containing data to send as the body of the request.
          - onSucces: Closure to call if the request was succesful (statuscode 200)
          - onFailure: Closure to call if the request failed for any reason
@@ -26,6 +27,7 @@ public class WebClient {
     static func send(withUrl url: URL,
                      withHttpMethod httpMethod: HttpMethod = HttpMethod.GET,
                      withParameters parameters: [String : Any] = [:],
+                     encodedAs encoding: String.Encoding = .utf8,
                      withHeaders headers: [String : String] = [:],
                      onSucces: @escaping (_ data: Data) -> (),
                      onFailure: @escaping () -> ()) -> URLSessionTask {
@@ -34,7 +36,7 @@ public class WebClient {
         request.httpMethod = httpMethod.asString
         
         // paramaters
-        if let paramData = parameters.stringFromHttpParameters().data(using: .utf8){
+        if let paramData = parameters.stringFromHttpParameters().data(using: encoding){
             request.httpBody = paramData
         }
         

@@ -8,10 +8,11 @@
 
 import UIKit
 
-class ArticleTableViewController: UITableViewController {
-
+class ArticleTableViewController: UITableViewController, IModalListener {
+    
     var viewModel: ArticleTableViewModel = ArticleTableViewModel()
     
+    @IBOutlet weak var loginBtn: UIButton!
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -24,12 +25,16 @@ class ArticleTableViewController: UITableViewController {
                                        action: #selector(refresh),
                                        for: UIControlEvents.valueChanged)
         
+        self.loginBtn.titleLabel?.adjustsFontSizeToFitWidth = true
+        
         // initial load of article data
         viewModel.loadMore(onSucces: refreshTable)
     }
     
     @IBAction func refresh(){
-        self.refreshControl?.endRefreshing()
+        DispatchQueue.main.async {
+            self.refreshControl?.endRefreshing()
+        }
         viewModel.cancelCurrentRequest()
         // clear articles cache
         viewModel.clearArticles()
@@ -69,7 +74,7 @@ class ArticleTableViewController: UITableViewController {
     
     // Infinite scrolling
     override func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-        if  indexPath.row >= self.viewModel.getArticleCount() - 1 && !viewModel.hasRequest() {
+        if  indexPath.row >= self.viewModel.getArticleCount() - 1 {
             let viewModel = self.viewModel
             
             viewModel.loadMore(onSucces: {
@@ -83,10 +88,16 @@ class ArticleTableViewController: UITableViewController {
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         // Get the new view controller using segue.destinationViewController.
         // Pass the selected object to the new view controller.
+        
+        // detail view
         if let viewController = segue.destination as? ArticleDetailViewController {
             if let cell = sender as? ArticleTableViewCell {
                 viewController.article = cell.article
             }
+        }
+        // login view
+        else if let viewController = segue.destination as? LoginViewController {
+            viewController.modalListener = self
         }
     }
     
@@ -96,5 +107,50 @@ class ArticleTableViewController: UITableViewController {
         DispatchQueue.main.async {
             self.tableView.reloadData()
         }
+    }
+    
+    // IModalClose protocol implementation
+    func onModalSucces() {
+        loggedInStateChanged()
+    }
+    
+    private func loggedInStateChanged() {
+        // update the table data since logged in state changed and ui needs to reflect that
+        refresh()
+        updateLoginButton()
+    }
+    
+    // update the login button functionality to either login or logout based on whether the user is logeed in currently
+    private func updateLoginButton() {
+        // is logged in -> logout
+        if authenticationService.isLoggedIn() {
+            DispatchQueue.main.async {
+                // removes all events from the button
+                self.loginBtn.removeTarget(nil, action: nil, for: .allEvents)
+                // set the action of the button to logout
+                self.loginBtn.setTitle("Log out", for: .normal)
+                self.loginBtn.addTarget(self, action: #selector(self.logoutAction), for: .touchUpInside)
+            }
+        }
+        // is not logged in -> login
+        else {
+            DispatchQueue.main.async {
+                // removes all events from the button
+                self.loginBtn.removeTarget(nil, action: nil, for: .allEvents)
+                // set the action of the button to login
+                self.loginBtn.setTitle("Login", for: .normal)
+                self.loginBtn.addTarget(self, action: #selector(self.loginAction), for: .touchUpInside)
+            }
+        }
+    }
+    
+    @IBAction private func logoutAction() {
+        if authenticationService.logOut() {
+            loggedInStateChanged()
+        }
+    }
+    
+    @IBAction private func loginAction() {
+        performSegue(withIdentifier: "login", sender: self)
     }
 }

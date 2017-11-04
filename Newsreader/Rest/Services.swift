@@ -8,4 +8,5 @@
 
 import Foundation
 
-public let articleService : ArticleService = ArticleService()
+public let articleService: ArticleService = ArticleService()
+public let authenticationService: AuthenticationService = AuthenticationService()
