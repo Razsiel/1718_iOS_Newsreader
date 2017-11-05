@@ -26,9 +26,15 @@ class ArticleTableViewController: UITableViewController, IModalListener {
                                        for: UIControlEvents.valueChanged)
         
         self.loginBtn.titleLabel?.adjustsFontSizeToFitWidth = true
+        updateLoginButton()
         
         // initial load of article data
         viewModel.loadMore(onSucces: refreshTable)
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        // refresh ui in case something changed in a different page
+        self.refreshTable()
     }
     
     @IBAction func refresh(){
@@ -74,7 +80,7 @@ class ArticleTableViewController: UITableViewController, IModalListener {
     
     // Infinite scrolling
     override func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-        if  indexPath.row >= self.viewModel.getArticleCount() - 1 {
+        if  indexPath.row >= self.viewModel.getArticleCount() - 1 && !self.viewModel.hasRequest() {
             let viewModel = self.viewModel
             
             viewModel.loadMore(onSucces: {

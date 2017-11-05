@@ -35,7 +35,7 @@ class ArticleTableViewCell: UITableViewCell {
         
         titleLabel.text = self.article!.title
         summaryLabel.text = self.article!.summary
-        favoriteImage.isHidden = !self.article!.isLiked
+        favoriteImage.isHidden = !authenticationService.isLoggedIn() || !self.article!.isLiked
         
         // image loading
         task?.cancel()

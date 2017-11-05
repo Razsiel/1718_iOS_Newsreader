@@ -20,25 +20,20 @@ public class ArticleTableViewModel {
                 self.articles.append(article)
             }
             self.nextId = result.nextId
-            onSucces()  
+            onSucces()
             self.pendingRequest = nil
         }
         
         // failure closure
         let failure = {
+            self.pendingRequest = nil
             print("failed...")
         }
         
         // call service layer
-        if nextId == nil {
-            self.pendingRequest = articleService.getArticles(onSucces: succes,
-                                                             onFailure: failure)
-        } else {
-            self.pendingRequest = articleService.getArticle(withId: self.nextId!,
-                                                            count: 20,
-                                                            onSucces: succes,
-                                                            onFailure: failure)
-        }
+        self.pendingRequest = articleService.getArticles(withNextId: self.nextId,
+                                                         onSucces: succes,
+                                                         onFailure: failure)
     }
     
     public func getArticle(at: Int) -> Article? {

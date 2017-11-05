@@ -27,6 +27,7 @@ class ArticleDetailViewController: UIViewController, UIToggleButtonDelegate {
         // Do any additional setup after loading the view.
         titleLabel.text = self.article?.title
         summaryLabel.text = self.article?.summary
+        dateLabel.text = self.article?.publishDate
         
         // cancel a still running task (not sure if tasks are automatically cancelled when a view gets dismissed)
         articleImageTask?.cancel()
@@ -41,6 +42,22 @@ class ArticleDetailViewController: UIViewController, UIToggleButtonDelegate {
                                   target: self,
                                   action: #selector(self.onReadMoreButtonClick(_:)))
         self.navigationItem.setRightBarButton(btn, animated: false)
+        
+        // like button
+        
+        self.likeBtn.activeText = "Unlike"
+        self.likeBtn.disabledText = "Like"
+        
+        // show/hide button based on logged in state
+        self.likeBtn.isHidden = !authenticationService.isLoggedIn()
+        
+        // set button state to reflect the article isLiked state
+        if let article = self.article {
+            self.likeBtn.activateButton(bool: article.isLiked)
+        }
+        
+        // ste listener to this instance of the controller
+        self.likeBtn.setStateChangeListener(self)
     }
     
     @IBAction func onReadMoreButtonClick(_ sender : AnyObject) {
@@ -71,9 +88,13 @@ class ArticleDetailViewController: UIViewController, UIToggleButtonDelegate {
     func onStateChange(state: Bool) {
         if let articleId = self.article?.id {
             articleLikeTask = articleService.likeArticle(withId: articleId, newState: state, onSucces: {
-                // ignore, nothing needs to happen if the call was succesful
+                // change local article isliked property
+                self.article?.isLiked = state
             }, onFailure: {
                 // show error to user and reset button to previous state
+                if let isLiked = self.article?.isLiked {
+                    self.likeBtn.activateButton(bool: isLiked)
+                }
             })
         }
     }

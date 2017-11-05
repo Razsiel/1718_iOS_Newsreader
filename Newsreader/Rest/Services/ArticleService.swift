@@ -24,11 +24,17 @@ public class ArticleService {
      
      - returns: The URLSessionTask object that makes the request. By capturing this object, a request can be cancelled at any time by calling .cancel()
      */
-    public func getArticles(onSucces: @escaping (_ result: ArticleResult) -> (),
+    public func getArticles(withNextId : Int?,
+                            onSucces: @escaping (_ result: ArticleResult) -> (),
                             onFailure: @escaping () -> ()) -> URLSessionTask? {
+        var params = [String : Any]()
+        if let nextId = withNextId {
+            params["nextId"] = nextId
+        }
         // call to network layer
         return apiClient.send(toRelativePath: "/api/articles",
                               withHttpMethod: HttpMethod.GET,
+                              withParameters: params,
                               onSuccesParser: { (_ data: Data) in
                         // call shared parser
                         self.onArticleResultSucces(data: data,

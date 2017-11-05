@@ -26,7 +26,10 @@ class UIToggleButton: UIButton {
         initButton()
     }
     
-    func initButton() {
+    private func initButton() {
+        // set initial state
+        activateButton(bool: isOn)
+        // add press handler
         addTarget(self, action: #selector(self.buttonPressed), for: .touchUpInside)
     }
     
@@ -39,13 +42,9 @@ class UIToggleButton: UIButton {
         isOn = bool
         
         // update ui
-        let color = bool ? UIColor.blue : UIColor.clear
         let title = bool ? activeText : disabledText
-        let titleColor = bool ? UIColor.white : UIColor.blue
         
         setTitle(title, for: .normal)
-        setTitleColor(titleColor, for: .normal)
-        backgroundColor = color
         
         // call listener
         toggleStateDelegate?.onStateChange(state: isOn)
